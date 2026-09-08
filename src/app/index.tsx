@@ -1,5 +1,6 @@
 import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Platform, Pressable, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -8,6 +9,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -29,6 +32,25 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
+  const theme = useTheme();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  useEffect(() => {
+    initDatabase().then(() => getPlayers().then(setPlayers));
+  }, []);
+
+  async function handleAddPlayer() {
+    if (!firstName.trim() || !lastName.trim()) {
+      return;
+    }
+    await addPlayer(firstName.trim(), lastName.trim());
+    setPlayers(await getPlayers());
+    setFirstName('');
+    setLastName('');
+  }
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -53,6 +75,42 @@ export default function HomeScreen() {
             title="Fresh start"
             hint={<ThemedText type="code">npm run reset-project</ThemedText>}
           />
+        </ThemedView>
+
+        <ThemedView type="backgroundElement" style={styles.stepContainer}>
+          <ThemedText type="code" style={styles.code}>
+            spieler
+          </ThemedText>
+
+          <ThemedView style={styles.playerForm}>
+            <TextInput
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Vorname"
+              placeholderTextColor={theme.textSecondary}
+              style={[styles.input, { color: theme.text, borderColor: theme.backgroundSelected }]}
+            />
+            <TextInput
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Nachname"
+              placeholderTextColor={theme.textSecondary}
+              style={[styles.input, { color: theme.text, borderColor: theme.backgroundSelected }]}
+            />
+            <Pressable
+              onPress={handleAddPlayer}
+              style={[styles.addButton, { backgroundColor: theme.backgroundSelected }]}>
+              <ThemedText type="smallBold">Hinzufügen</ThemedText>
+            </Pressable>
+          </ThemedView>
+
+          {players.map((player) => (
+            <HintRow
+              key={player.id}
+              title={`${player.firstName} ${player.lastName}`}
+              hint={<ThemedText type="code">{player.id}</ThemedText>}
+            />
+          ))}
         </ThemedView>
 
         {Platform.OS === 'web' && <WebBadge />}
@@ -94,5 +152,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
+  },
+  playerForm: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: Spacing.two,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.two,
+  },
+  addButton: {
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.three,
+    borderRadius: Spacing.two,
   },
 });
