@@ -1,6 +1,6 @@
 import * as Device from 'expo-device';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, TextInput } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -9,7 +9,6 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
 
 function getDevMenuHint() {
@@ -32,23 +31,15 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
-  const theme = useTheme();
   const [players, setPlayers] = useState<Player[]>([]);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
 
   useEffect(() => {
     initDatabase().then(() => getPlayers().then(setPlayers));
   }, []);
 
   async function handleAddPlayer() {
-    if (!firstName.trim() || !lastName.trim()) {
-      return;
-    }
-    await addPlayer(firstName.trim(), lastName.trim());
+    await addPlayer();
     setPlayers(await getPlayers());
-    setFirstName('');
-    setLastName('');
   }
 
   return (
@@ -82,33 +73,17 @@ export default function HomeScreen() {
             spieler
           </ThemedText>
 
-          <ThemedView style={styles.playerForm}>
-            <TextInput
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder="Vorname"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text, borderColor: theme.backgroundSelected }]}
-            />
-            <TextInput
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder="Nachname"
-              placeholderTextColor={theme.textSecondary}
-              style={[styles.input, { color: theme.text, borderColor: theme.backgroundSelected }]}
-            />
-            <Pressable
-              onPress={handleAddPlayer}
-              style={[styles.addButton, { backgroundColor: theme.backgroundSelected }]}>
-              <ThemedText type="smallBold">Hinzufügen</ThemedText>
-            </Pressable>
-          </ThemedView>
+          <Pressable onPress={handleAddPlayer} style={styles.addButton}>
+            <ThemedView type="backgroundSelected" style={styles.addButtonInner}>
+              <ThemedText type="smallBold">Spieler hinzufügen</ThemedText>
+            </ThemedView>
+          </Pressable>
 
           {players.map((player) => (
             <HintRow
               key={player.id}
-              title={`${player.firstName} ${player.lastName}`}
-              hint={<ThemedText type="code">{player.id}</ThemedText>}
+              title={`Spieler #${player.id}`}
+              hint={<ThemedText type="code">{player.wins} wins / {player.games} games</ThemedText>}
             />
           ))}
         </ThemedView>
@@ -153,20 +128,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
   },
-  playerForm: {
-    flexDirection: 'row',
-    gap: Spacing.two,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.two,
-  },
   addButton: {
+    alignSelf: 'flex-start',
+  },
+  addButtonInner: {
     justifyContent: 'center',
     paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
   },
 });
