@@ -12,6 +12,7 @@ const GAME_TABLE_KEY = `${DATABASE_NAME}/game`;
 
 export type Player = {
   id: number;
+  name: string;
   games: number;
   wins: number;
 };
@@ -48,9 +49,9 @@ export async function getPlayers(): Promise<Player[]> {
   return raw ? (JSON.parse(raw) as Player[]) : [];
 }
 
-export async function addPlayer(): Promise<Player> {
+export async function addPlayer(name: string): Promise<Player> {
   const players = await getPlayers();
-  const player: Player = { id: await nextId(players), games: 0, wins: 0 };
+  const player: Player = { id: await nextId(players), name, games: 0, wins: 0 };
   await AsyncStorage.setItem(
     PLAYER_TABLE_KEY,
     JSON.stringify([...players, player]),
