@@ -5,15 +5,18 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import type { Player } from '@/lib/players-db';
 
-type MatchFormat = '1' | '3';
+export type MatchFormat = '1' | '3';
 
 type MatchFormProps = {
   players: Player[];
+  onStartMatch: (player1: Player, player2: Player, format: MatchFormat) => void;
 };
 
-export function MatchForm({ players }: MatchFormProps) {
+export function MatchForm({ players, onStartMatch }: MatchFormProps) {
+  const theme = useTheme();
   const [player1Id, setPlayer1Id] = useState<number | null>(null);
   const [player2Id, setPlayer2Id] = useState<number | null>(null);
   const [matchFormat, setMatchFormat] = useState<MatchFormat>('3');
@@ -21,12 +24,14 @@ export function MatchForm({ players }: MatchFormProps) {
   const canStartMatch = player1Id !== null && player2Id !== null && player1Id !== player2Id;
 
   function handleStartMatch() {
-    if (!canStartMatch) return;
-    // TODO: navigate to the live match screen once it exists.
+    const player1 = players.find((p) => p.id === player1Id);
+    const player2 = players.find((p) => p.id === player2Id);
+    if (!canStartMatch || !player1 || !player2) return;
+    onStartMatch(player1, player2, matchFormat);
   }
 
   return (
-    <ThemedView type="backgroundElement" style={styles.stepContainer}>
+    <ThemedView type="backgroundElement" style={[styles.stepContainer, { borderColor: theme.border }]}>
       <ThemedText type="code" style={styles.code}>
         match
       </ThemedText>
@@ -37,7 +42,7 @@ export function MatchForm({ players }: MatchFormProps) {
           <Pressable key={player.id} onPress={() => setPlayer1Id(player.id)}>
             <ThemedView
               type={player.id === player1Id ? 'backgroundSelected' : 'backgroundElement'}
-              style={styles.pill}
+              style={[styles.pill, { borderColor: theme.border }]}
             >
               <ThemedText type="smallBold">{player.name}</ThemedText>
             </ThemedView>
@@ -51,7 +56,7 @@ export function MatchForm({ players }: MatchFormProps) {
           <Pressable key={player.id} onPress={() => setPlayer2Id(player.id)}>
             <ThemedView
               type={player.id === player2Id ? 'backgroundSelected' : 'backgroundElement'}
-              style={styles.pill}
+              style={[styles.pill, { borderColor: theme.border }]}
             >
               <ThemedText type="smallBold">{player.name}</ThemedText>
             </ThemedView>
@@ -64,7 +69,7 @@ export function MatchForm({ players }: MatchFormProps) {
         <Pressable onPress={() => setMatchFormat('1')}>
           <ThemedView
             type={matchFormat === '1' ? 'backgroundSelected' : 'backgroundElement'}
-            style={styles.pill}
+            style={[styles.pill, { borderColor: theme.border }]}
           >
             <ThemedText type="smallBold">1 Satz</ThemedText>
           </ThemedView>
@@ -72,7 +77,7 @@ export function MatchForm({ players }: MatchFormProps) {
         <Pressable onPress={() => setMatchFormat('3')}>
           <ThemedView
             type={matchFormat === '3' ? 'backgroundSelected' : 'backgroundElement'}
-            style={styles.pill}
+            style={[styles.pill, { borderColor: theme.border }]}
           >
             <ThemedText type="smallBold">3 Sätze</ThemedText>
           </ThemedView>
@@ -82,7 +87,7 @@ export function MatchForm({ players }: MatchFormProps) {
       <Pressable onPress={handleStartMatch} disabled={!canStartMatch} style={styles.addButton}>
         <ThemedView
           type="backgroundSelected"
-          style={[styles.addButtonInner, !canStartMatch && styles.addButtonDisabled]}
+          style={[styles.addButtonInner, { borderColor: theme.border }, !canStartMatch && styles.addButtonDisabled]}
         >
           <ThemedText type="smallBold">Match starten</ThemedText>
         </ThemedView>
@@ -101,6 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   addButton: {
     alignSelf: 'flex-start',
@@ -110,6 +116,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   addButtonDisabled: {
     opacity: 0.4,
@@ -123,5 +130,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });

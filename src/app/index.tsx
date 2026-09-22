@@ -1,61 +1,43 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HintRow } from '@/components/hint-row';
-import { MatchForm } from '@/components/match-form';
-import { ThemedText } from '@/components/themed-text';
+import { MatchCounter } from '@/components/match-counter';
+import { MatchForm, type MatchFormat } from '@/components/match-form';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
+import { getPlayers, initDatabase, type Player } from '@/lib/players-db';
+
+type ActiveMatch = {
+  player1: Player;
+  player2: Player;
+  format: MatchFormat;
+};
 
 export default function HomeScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [newPlayerName, setNewPlayerName] = useState('');
+  const [activeMatch, setActiveMatch] = useState<ActiveMatch | null>(null);
 
   useEffect(() => {
     initDatabase().then(() => getPlayers().then(setPlayers));
   }, []);
 
-  async function handleAddPlayer() {
-    const name = newPlayerName.trim();
-    if (!name) return;
-    await addPlayer(name);
-    setNewPlayerName('');
-    setPlayers(await getPlayers());
-  }
-
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <ThemedText type="code" style={styles.code}>
-            spieler
-          </ThemedText>
-
-          <TextInput
-            value={newPlayerName}
-            onChangeText={setNewPlayerName}
-            placeholder="Name"
-            style={styles.nameInput}
+        {activeMatch ? (
+          <MatchCounter
+            player1={activeMatch.player1}
+            player2={activeMatch.player2}
+            format={activeMatch.format}
+            onEndMatch={() => setActiveMatch(null)}
           />
-
-          <Pressable onPress={handleAddPlayer} style={styles.addButton}>
-            <ThemedView type="backgroundSelected" style={styles.addButtonInner}>
-              <ThemedText type="smallBold">Spieler hinzufügen</ThemedText>
-            </ThemedView>
-          </Pressable>
-
-          {players.map((player) => (
-            <HintRow
-              key={player.id}
-              title={player.name}
-              hint={<ThemedText type="code">{player.wins} wins / {player.games} games</ThemedText>}
-            />
-          ))}
-        </ThemedView>
-
-        <MatchForm players={players} />
+        ) : (
+          <MatchForm
+            players={players}
+            onStartMatch={(player1, player2, format) => setActiveMatch({ player1, player2, format })}
+          />
+        )}
       </SafeAreaView>
     </ThemedView>
   );
@@ -75,32 +57,5 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-  nameInput: {
-    alignSelf: 'stretch',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#8888',
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-  },
-  addButton: {
-    alignSelf: 'flex-start',
-  },
-  addButtonInner: {
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
   },
 });
