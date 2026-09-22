@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HintRow } from '@/components/hint-row';
+import { MatchForm } from '@/components/match-form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -53,6 +54,8 @@ export default function HomeScreen() {
             />
           ))}
         </ThemedView>
+
+        <MatchForm players={players} />
       </SafeAreaView>
     </ThemedView>
   );
