@@ -8,6 +8,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
+import HeaderCard from '../components/header-card';
+
 
 export default function HomeScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -28,11 +30,17 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
+        <HeaderCard
+            logo="Rally"
+            title="Matchverlauf"
+            subtitle="Track your matches"
+          />
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
+          
           <ThemedText type="code" style={styles.code}>
             spieler
           </ThemedText>
-
+          
           <TextInput
             value={newPlayerName}
             onChangeText={setNewPlayerName}
@@ -56,6 +64,7 @@ export default function HomeScreen() {
         </ThemedView>
 
         <MatchForm players={players} />
+  
       </SafeAreaView>
     </ThemedView>
   );
@@ -69,7 +78,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: Spacing.none,
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.three,
@@ -84,6 +93,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
+    marginVertical: Spacing.three,
     borderRadius: Spacing.four,
   },
   nameInput: {
