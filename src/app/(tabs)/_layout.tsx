@@ -4,15 +4,15 @@ import { StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
-  // How much space the phone needs at the bottom (e.g. the iPhone home bar)
+
   const insets = useSafeAreaInsets();
 
   return (
     <Tabs style={styles.root}>
-      {/* The current page (Verlauf, Neues Match or Statistik) shows here */}
+      {}
       <TabSlot style={styles.slot} />
 
-      {/* The bottom nav */}
+      {/* Logik für Tab Navigation*/}
       <TabList style={[styles.bar, { paddingBottom: insets.bottom }]}>
         <TabTrigger name="history" href="/" style={styles.tab}>
           <Text style={styles.label}>Verlauf</Text>
@@ -30,13 +30,14 @@ export default function TabLayout() {
   );
 }
 
+//Styling für Tab Navigation
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
   slot: {
-    flexShrink: 1,                 // let the page shrink so the ScrollView can scroll
+    flexShrink: 1,                 
   },
  bar: {
   flexDirection: 'row',
@@ -44,9 +45,9 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   backgroundColor: '#FFFFFF',
   paddingTop: 8,
-  width: '100%',               // fill the screen on small phones…
-  maxWidth: MaxContentWidth,   // …but never wider than the rest of the app
-  alignSelf: 'center',         // and sit in the middle
+  width: '100%',               
+  maxWidth: MaxContentWidth,   
+  alignSelf: 'center',         
   marginBottom: 8,
 },
   tab: {
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   plus: {
     width: 48,
     height: 48,
-    borderRadius: 24,              // half of width → circle
+    borderRadius: 24,              
     backgroundColor: '#3AA3B8',
     alignItems: 'center',
     justifyContent: 'center',

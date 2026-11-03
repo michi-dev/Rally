@@ -1,6 +1,17 @@
-// src/app/(tabs)/new-match.tsx
+import HeaderCard from '@/components/header-card';
+import { Screen } from '@/components/screen';
 import { Text } from 'react-native';
 
+//header Konfiguration
 export default function NewMatchScreen() {
-  return <Text>Neues Match</Text>;
+  return (
+    <Screen>
+      <HeaderCard
+        logo="Rally"
+        title="Neues Match"
+        subtitle="Spieler eingeben & starten"
+      />
+      <Text>Form comes here</Text>
+    </Screen>
+  );
 }
