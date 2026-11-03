@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 
+import HeaderCard from '@/components/header-card';
 import { HintRow } from '@/components/hint-row';
 import { MatchForm } from '@/components/match-form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
-import HeaderCard from '../components/header-card';
 
 
 export default function HomeScreen() {
@@ -29,7 +28,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.content}>
         <HeaderCard
             logo="Rally"
             title="Matchverlauf"
@@ -65,7 +64,7 @@ export default function HomeScreen() {
 
         <MatchForm players={players} />
   
-      </SafeAreaView>
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -73,17 +72,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.none,
+  content: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
+    alignSelf: 'center',
+    width: '100%',
     maxWidth: MaxContentWidth,
+    gap: Spacing.three,
+    paddingBottom: Spacing.three,
   },
   code: {
     textTransform: 'uppercase',
