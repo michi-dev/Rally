@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { Pressable, StyleSheet, TextInput } from 'react-native';
 
 import HeaderCard from '@/components/header-card';
 import { HintRow } from '@/components/hint-row';
 import { MatchForm } from '@/components/match-form';
+import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { addPlayer, getPlayers, initDatabase, type Player } from '@/lib/players-db';
 
 
@@ -27,8 +28,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <Screen>
         <HeaderCard
             logo="Rally"
             title="Matchverlauf"
@@ -64,23 +64,11 @@ export default function HomeScreen() {
 
         <MatchForm players={players} />
   
-      </ScrollView>
-    </ThemedView>
-  );
+      </Screen>
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    gap: Spacing.three,
-    paddingBottom: Spacing.three,
-  },
   code: {
     textTransform: 'uppercase',
   },
