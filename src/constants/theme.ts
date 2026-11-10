@@ -54,6 +54,7 @@ export const Fonts = Platform.select({
 });
 
 export const Spacing = {
+  none: 0,
   half: 2,
   one: 4,
   two: 8,
