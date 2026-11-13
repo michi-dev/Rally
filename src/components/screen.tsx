@@ -21,6 +21,7 @@ export function Screen({ children }: ScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#E7E5D7',
   },
   content: {
     alignItems: 'center',
