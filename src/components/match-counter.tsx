@@ -9,11 +9,17 @@ import { useTheme } from '@/hooks/use-theme';
 import type { MatchFormat } from '@/components/match-form';
 import type { Player } from '@/lib/players-db';
 
+export type MatchResult = {
+  sets1: number;      // gewonnene Sätze Player 1
+  sets2: number;      // gewonnene Sätze Player 2
+  games: string;      // Punktestand
+};
+
 type MatchCounterProps = {
   player1: Player;
   player2: Player;
   format: MatchFormat;
-  onEndMatch: () => void;
+  onEndMatch: (result: MatchResult | null) => void; 
 };
 
 type PlayerKey = 'p1' | 'p2';
@@ -132,7 +138,17 @@ export function MatchCounter({ player1, player2, format, onEndMatch }: MatchCoun
     if (winner) return;
     setState((prev) => scorePoint(prev, scorer));
   }
-
+  function handleEndMatch() {
+      if (!winner) {
+        onEndMatch(null);
+        return;
+      }
+      onEndMatch({
+        sets1,
+        sets2,
+        games: setHistory.map((s) => `${s.games1}:${s.games2}`).join(','),
+      });
+    }
   const isDeuce = !tiebreak && points1 >= 3 && points2 >= 3 && points1 === points2;
 
   return (
@@ -193,7 +209,7 @@ export function MatchCounter({ player1, player2, format, onEndMatch }: MatchCoun
         </View>
       )}
 
-      <Pressable onPress={onEndMatch} style={styles.endButton}>
+      <Pressable onPress={handleEndMatch} style={styles.endButton}>
         <ThemedView type="backgroundSelected" style={[styles.endButtonInner, { borderColor: theme.border }]}>
           <ThemedText type="smallBold">Match beenden</ThemedText>
         </ThemedView>
