@@ -1,52 +1,57 @@
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 
 import HeaderCard from '@/components/header-card';
-import { MatchCounter } from '@/components/match-counter';
-import { MatchForm, type MatchFormat } from '@/components/match-form';
 import { Screen } from '@/components/screen';
-import { addGame, getPlayers, initDatabase, type Player } from '@/lib/players-db';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Spacing } from '@/constants/theme';
+import { getGames, getPlayers, initDatabase, type Game, type Player } from '@/lib/players-db';
+import { StyleSheet } from 'react-native';
 
-type ActiveMatch = {
-  player1: Player;
-  player2: Player;
-  format: MatchFormat;
-};
-
-export default function HomeScreen() {
+export default function HistoryScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [activeMatch, setActiveMatch] = useState<ActiveMatch | null>(null);
+  const [games, setGames] = useState<Game[]>([]);
 
-  useEffect(() => {
-    initDatabase().then(() => getPlayers().then(setPlayers));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      async function load() {
+        await initDatabase();
+        setPlayers(await getPlayers());
+        setGames(await getGames());
+      }
+      load();
+    }, []),
+  );
 
-  return (
+
+  function nameOf(id: number) {
+    return players.find((p) => p.id === id)?.name ?? 'Unbekannt';
+  }
+
+   return (
     <Screen>
-      <HeaderCard logo="Rally" title="Matchverlauf" subtitle="Track your matches" />
-      {activeMatch ? (
-        <MatchCounter
-          player1={activeMatch.player1}
-          player2={activeMatch.player2}
-          format={activeMatch.format}
-          onEndMatch={async (result) => {
-            if (result) {
-              await addGame(
-                activeMatch.player1.id,
-                activeMatch.player2.id,
-                `${result.sets1}/${result.sets2}`,
-              result.games,
-              );
-            }
-            setActiveMatch(null);
-          }}
-
-        />
-      ) : (
-        <MatchForm
-          players={players}
-          onStartMatch={(player1, player2, format) => setActiveMatch({ player1, player2, format })}
-        />
-      )}
+      <HeaderCard logo="Rally" title="Matchverlauf" subtitle={`${games.length} Matches`} />
+      <ThemedView type="backgroundElement" style={styles.card}>
+        {[...games].reverse().map((game) => (
+          <ThemedText key={game.id} type="small">
+            {nameOf(game.p1_fk)} {game.sets.replace('/', ' : ')} {nameOf(game.p2_fk)} · {game.games}
+          </ThemedText>
+        ))}
+      </ThemedView>
     </Screen>
   );
 }
+
+
+const styles = StyleSheet.create({
+  card: {
+    alignSelf: 'stretch',
+    gap: Spacing.three,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.four,
+    borderRadius: Spacing.four,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+});
+
