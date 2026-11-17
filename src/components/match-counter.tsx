@@ -9,7 +9,9 @@ import { Colors, Spacing } from '@/constants/theme';
 import type { Player } from '@/lib/database';
 import {
   getMatchWinner,
+  getPlayedSetScores,
   getPointsLabel,
+  hasMatchStarted,
   INITIAL_MATCH_STATE,
   isDeuce,
   scorePoint,
@@ -29,8 +31,10 @@ type MatchCounterProps = {
   player1: Player;
   player2: Player;
   bestOf: BestOf;
-  /** Wird mit `null` aufgerufen, wenn das Match ohne Sieger abgebrochen wird. */
-  onEndMatch: (result: MatchResult | null) => void;
+  /** Speichert das Match – auch wenn es manuell vor dem regulären Ende beendet wird. */
+  onSaveMatch: (result: MatchResult) => void;
+  /** Verwirft das Match, ohne etwas zu speichern. */
+  onCancelMatch: () => void;
 };
 
 function describeCurrentGame(state: MatchState): string {
@@ -39,7 +43,13 @@ function describeCurrentGame(state: MatchState): string {
   return `Punkte ${getPointsLabel(state.points1, state.points2)}:${getPointsLabel(state.points2, state.points1)}`;
 }
 
-export function MatchCounter({ player1, player2, bestOf, onEndMatch }: MatchCounterProps) {
+export function MatchCounter({
+  player1,
+  player2,
+  bestOf,
+  onSaveMatch,
+  onCancelMatch,
+}: MatchCounterProps) {
   const [state, setState] = useState<MatchState>(INITIAL_MATCH_STATE);
   const winnerSide = getMatchWinner(state, bestOf);
   const playersBySide: Record<PlayerSide, Player> = { player1, player2 };
@@ -50,12 +60,12 @@ export function MatchCounter({ player1, player2, bestOf, onEndMatch }: MatchCoun
     setState((previous) => scorePoint(previous, scorer));
   }
 
-  function handleEndMatch() {
-    if (!winner) {
-      onEndMatch(null);
-      return;
-    }
-    onEndMatch({ sets1: state.sets1, sets2: state.sets2, setScores: state.setHistory });
+  function handleSaveMatch() {
+    onSaveMatch({
+      sets1: state.sets1,
+      sets2: state.sets2,
+      setScores: getPlayedSetScores(state),
+    });
   }
 
   return (
@@ -103,7 +113,12 @@ export function MatchCounter({ player1, player2, bestOf, onEndMatch }: MatchCoun
       )}
 
       <PillRow>
-        <PillButton label="Match beenden" onPress={handleEndMatch} />
+        <PillButton
+          label="Speichern"
+          onPress={handleSaveMatch}
+          disabled={!hasMatchStarted(state)}
+        />
+        {!winner && <PillButton label="Abbrechen" muted onPress={onCancelMatch} />}
       </PillRow>
     </Card>
   );

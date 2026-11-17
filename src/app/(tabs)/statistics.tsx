@@ -27,6 +27,14 @@ export default function StatisticsScreen() {
           <ThemedText key={row.player.id}>{formatRankingRow(row, index + 1)}</ThemedText>
         ))}
       </Card>
+      <Card>
+        <ThemedText type="smallBold">Satzverteilung</ThemedText>
+        {stats.setDistribution.map((row) => (
+          <ThemedText key={row.setCount} type="small">
+            {row.setCount === 1 ? '1 Satz' : `${row.setCount} Sätze`}: {row.matchCount}
+          </ThemedText>
+        ))}
+      </Card>
     </Screen>
   );
 }

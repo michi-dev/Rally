@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { SetScore } from './tennis-scoring';
+import type { BestOf, SetScore } from './tennis-scoring';
 
 /**
  * AsyncStorage ist ein einfacher Key-Value-Speicher, keine relationale Datenbank.
@@ -22,13 +22,21 @@ export type Game = {
   timestamp: string;
   player1Id: number;
   player2Id: number;
+  /** Gewähltes Format: Match über 1 oder 3 Sätze */
+  bestOf: BestOf;
   /** Gewonnene Sätze von Spieler 1 */
   sets1: number;
   /** Gewonnene Sätze von Spieler 2 */
   sets2: number;
-  /** Games pro Satz, z.B. [{ games1: 6, games2: 4 }, { games1: 7, games2: 5 }] */
+  /**
+   * Games pro gespieltem Satz, z.B. [{ games1: 6, games2: 4 }, { games1: 7, games2: 5 }].
+   * Bei manuell beendeten Matches ist der angefangene Satz enthalten.
+   */
   setScores: SetScore[];
 };
+
+/** Matches, die vor dem Feld `bestOf` gespeichert wurden. */
+type GameWithoutBestOf = Omit<Game, 'bestOf'> & { bestOf?: BestOf };
 
 export type NewGame = Omit<Game, 'id' | 'timestamp'>;
 
@@ -44,8 +52,15 @@ type LegacyGame = {
   games: string;
 };
 
-function migrateLegacyGame(game: Game | LegacyGame): Game {
-  if (!('p1_fk' in game)) return game;
+/** Ältere Matches haben kein gespeichertes Format: Wer 2 Sätze gewonnen hat, spielte auf 3 Sätze. */
+function inferBestOf(sets1: number, sets2: number): BestOf {
+  return Math.max(sets1, sets2) >= 2 ? 3 : 1;
+}
+
+function migrateLegacyGame(game: GameWithoutBestOf | LegacyGame): Game {
+  if (!('p1_fk' in game)) {
+    return { ...game, bestOf: game.bestOf ?? inferBestOf(game.sets1, game.sets2) };
+  }
 
   const [sets1, sets2] = game.sets.split('/').map(Number);
   const setScores = game.games
@@ -61,6 +76,7 @@ function migrateLegacyGame(game: Game | LegacyGame): Game {
     timestamp: game.timestamp,
     player1Id: game.p1_fk,
     player2Id: game.p2_fk,
+    bestOf: inferBestOf(sets1, sets2),
     sets1,
     sets2,
     setScores,
@@ -76,8 +92,8 @@ async function writeTable<T>(key: string, records: T[]): Promise<void> {
   await AsyncStorage.setItem(key, JSON.stringify(records));
 }
 
-function nextId(records: { id: number }[]): number {
-  return records.reduce((maxId, record) => Math.max(maxId, record.id), 0) + 1;
+function nextId(usedIds: number[]): number {
+  return Math.max(0, ...usedIds) + 1;
 }
 
 export async function getPlayers(): Promise<Player[]> {
@@ -85,20 +101,41 @@ export async function getPlayers(): Promise<Player[]> {
 }
 
 export async function addPlayer(name: string): Promise<Player> {
-  const players = await getPlayers();
-  const player: Player = { id: nextId(players), name };
+  const [players, games] = await Promise.all([getPlayers(), getGames()]);
+  // Auch IDs gelöschter Spieler, die noch in Matches vorkommen, gelten als vergeben.
+  // Sonst würde ein neuer Spieler die alten Matches eines gelöschten Spielers übernehmen.
+  const usedIds = [
+    ...players.map((player) => player.id),
+    ...games.flatMap((game) => [game.player1Id, game.player2Id]),
+  ];
+  const player: Player = { id: nextId(usedIds), name };
   await writeTable(PLAYER_TABLE_KEY, [...players, player]);
   return player;
 }
 
+/**
+ * Löscht nur den Spieler. Seine Matches bleiben im Verlauf und in der Gesamtstatistik erhalten.
+ */
+export async function deletePlayer(playerId: number): Promise<void> {
+  const players = await getPlayers();
+  await writeTable(
+    PLAYER_TABLE_KEY,
+    players.filter((player) => player.id !== playerId),
+  );
+}
+
 export async function getGames(): Promise<Game[]> {
-  const games = await readTable<Game | LegacyGame>(GAME_TABLE_KEY);
+  const games = await readTable<GameWithoutBestOf | LegacyGame>(GAME_TABLE_KEY);
   return games.map(migrateLegacyGame);
 }
 
 export async function addGame(newGame: NewGame): Promise<Game> {
   const games = await getGames();
-  const game: Game = { id: nextId(games), timestamp: new Date().toISOString(), ...newGame };
+  const game: Game = {
+    id: nextId(games.map((g) => g.id)),
+    timestamp: new Date().toISOString(),
+    ...newGame,
+  };
   await writeTable(GAME_TABLE_KEY, [...games, game]);
   return game;
 }
