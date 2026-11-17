@@ -8,7 +8,7 @@ import type { Player } from '@/lib/database';
 import { formatSetScores } from '@/lib/tennis-scoring';
 
 function playerName(players: Player[], playerId: number): string {
-  return players.find((player) => player.id === playerId)?.name ?? 'Unbekannt';
+  return players.find((player) => player.id === playerId)?.name ?? 'Gelöschter Spieler';
 }
 
 export default function HistoryScreen() {

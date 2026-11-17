@@ -116,6 +116,24 @@ export function getMatchWinner(state: MatchState, bestOf: BestOf): PlayerSide | 
   return null;
 }
 
+export function hasMatchStarted(state: MatchState): boolean {
+  return (
+    state.points1 + state.points2 + state.games1 + state.games2 + state.setHistory.length > 0 ||
+    state.isTiebreak
+  );
+}
+
+/**
+ * Alle bisher gespielten Sätze. Wird ein Match manuell gespeichert, zählt ein
+ * angefangener Satz mit seinem aktuellen Game-Stand dazu.
+ */
+export function getPlayedSetScores(state: MatchState): SetScore[] {
+  const currentSetStarted = state.games1 + state.games2 > 0;
+  return currentSetStarted
+    ? [...state.setHistory, { games1: state.games1, games2: state.games2 }]
+    : state.setHistory;
+}
+
 export function isDeuce(state: MatchState): boolean {
   return !state.isTiebreak && state.points1 >= POINTS_FOR_DEUCE && state.points1 === state.points2;
 }
