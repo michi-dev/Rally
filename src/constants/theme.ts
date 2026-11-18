@@ -4,7 +4,8 @@ import { Platform } from 'react-native';
 
 /** Alle Farben der App. Die App hat bewusst nur ein helles Farbschema. */
 export const Colors = {
-  text: '#000000',
+  text: '#17485A',
+  textMuted: '#9A9A8E',
   textPlaceholder: '#8A8A8A',
   textOnBrand: '#FFFFFF',
   textOnBrandMuted: '#90C4D8',
@@ -16,6 +17,8 @@ export const Colors = {
   border: '#000000',
   brand: '#17485A',
   accent: '#3AA3B8',
+  win: '#8DB33A',
+  track: '#EEEDE6'
 } as const;
 
 export type ThemeColor = keyof typeof Colors;

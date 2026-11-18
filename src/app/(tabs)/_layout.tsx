@@ -39,7 +39,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundScreen,
   },
   slot: {
     flexShrink: 1,
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 20,
+    fontWeight: '400',
     color: Colors.accent,
   },
   newMatchButton: {
@@ -73,5 +74,6 @@ const styles = StyleSheet.create({
   newMatchLabel: {
     color: Colors.textOnBrand,
     fontSize: 26,
+    fontWeight: '600',
   },
 });

@@ -38,7 +38,7 @@ export function AddPlayerForm({ players, onAddPlayer }: AddPlayerFormProps) {
         style={styles.input}
         accessibilityLabel="Name des neuen Spielers"
       />
-      {nameExists && <ThemedText type="small">Diesen Spieler gibt es bereits.</ThemedText>}
+      {nameExists && <ThemedText style={{color:Colors.error}} type="small">Diesen Spieler gibt es bereits.</ThemedText>}
       <PillRow>
         <PillButton label="Spieler hinzufügen" onPress={handleAddPlayer} disabled={!canAddPlayer} />
       </PillRow>
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.border,
+    borderColor: Colors.track,
     color: Colors.text,
     fontSize: 16,
+    backgroundColor: Colors.track,
   },
 });

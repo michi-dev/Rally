@@ -28,18 +28,23 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.brand,
     paddingHorizontal: Spacing.three,
     paddingBottom: Spacing.three,
+    borderRadius: 16,
   },
   logo: {
     color: Colors.textOnBrand,
-    fontSize: 10,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase'
   },
   title: {
     color: Colors.textOnBrand,
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
   subtitle: {
     color: Colors.textOnBrandMuted,
-    fontSize: 10,
+    fontSize: 13,
+    fontWeight: '400',
   },
 });

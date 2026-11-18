@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { Avatar } from '@/components/avatar';
 import { Card } from '@/components/card';
 import { PillButton, PillRow } from '@/components/pill-button';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Colors, Spacing } from '@/constants/theme';
 import type { Player } from '@/lib/database';
 import {
@@ -13,7 +13,6 @@ import {
   getPointsLabel,
   hasMatchStarted,
   INITIAL_MATCH_STATE,
-  isDeuce,
   scorePoint,
   type BestOf,
   type MatchState,
@@ -36,12 +35,6 @@ type MatchCounterProps = {
   /** Verwirft das Match, ohne etwas zu speichern. */
   onCancelMatch: () => void;
 };
-
-function describeCurrentGame(state: MatchState): string {
-  if (state.isTiebreak) return 'Punkte werden im Tiebreak oben gezählt';
-  if (isDeuce(state)) return 'Einstand';
-  return `Punkte ${getPointsLabel(state.points1, state.points2)}:${getPointsLabel(state.points2, state.points1)}`;
-}
 
 export function MatchCounter({
   player1,
@@ -71,50 +64,68 @@ export function MatchCounter({
   return (
     <Card>
       <View style={styles.scoreRow}>
-        <ThemedText type="subtitle">{player1.name}</ThemedText>
-        <ThemedText type="subtitle">
+        <Avatar name={player1.name} color={Colors.accent} />
+        <ThemedText type="smallBold">{player1.name}</ThemedText>
+        <Text style={styles.bigScore}>
           {state.sets1} : {state.sets2}
-        </ThemedText>
-        <ThemedText type="subtitle">{player2.name}</ThemedText>
+        </Text>
+        <ThemedText type="smallBold">{player2.name}</ThemedText>
+        <Avatar name={player2.name} />
       </View>
 
       {state.setHistory.length > 0 && (
-        <PillRow>
+        <View style={styles.chips}>
           {state.setHistory.map((set, setNumber) => (
-            <ThemedView key={setNumber} type="backgroundSelected" style={styles.setScore}>
-              <ThemedText type="code">
-                {set.games1}:{set.games2}
-              </ThemedText>
-            </ThemedView>
+            <Text key={setNumber} style={styles.chip}>
+              {set.games1}:{set.games2}
+            </Text>
           ))}
-        </PillRow>
+        </View>
       )}
 
       {winner ? (
         <ThemedText type="smallBold">{winner.name} gewinnt das Match!</ThemedText>
       ) : (
         <>
-          <ThemedText type="small">
-            Spiele {state.games1}:{state.games2}
-            {state.isTiebreak && ` (Tiebreak ${state.tiebreakPoints1}:${state.tiebreakPoints2})`}
+          <ThemedText type="label" style={styles.center}>
+            {state.isTiebreak ? 'Tiebreak' : 'Aktuelles Spiel'} · {state.games1}:{state.games2} Games
           </ThemedText>
-          <ThemedText type="small">{describeCurrentGame(state)}</ThemedText>
-          <PillRow>
-            <PillButton
-              label={`Punkt für ${player1.name}`}
-              onPress={() => handlePoint('player1')}
-            />
-            <PillButton
-              label={`Punkt für ${player2.name}`}
-              onPress={() => handlePoint('player2')}
-            />
-          </PillRow>
+          <View style={styles.tileRow}>
+            <View style={styles.pointTile}>
+              <Text style={styles.pointValue}>
+                {state.isTiebreak ? state.tiebreakPoints1 : getPointsLabel(state.points1, state.points2)}
+              </Text>
+              <ThemedText type="small">{player1.name}</ThemedText>
+            </View>
+            <View style={styles.pointTile}>
+              <Text style={styles.pointValue}>
+                {state.isTiebreak ? state.tiebreakPoints2 : getPointsLabel(state.points2, state.points1)}
+              </Text>
+              <ThemedText type="small">{player2.name}</ThemedText>
+            </View>
+          </View>
+
+          <View style={styles.tileRow}>
+            <View style={styles.half}>
+              <PillButton
+                label={`Punkt für ${player1.name}`}
+                onPress={() => handlePoint('player1')}
+              />
+            </View>
+            <View style={styles.half}>
+              <PillButton
+                label={`Punkt für ${player2.name}`}
+                onPress={() => handlePoint('player2')}
+              />
+            </View>
+          </View>
         </>
       )}
 
       <PillRow>
         <PillButton
           label="Speichern"
+          strong
           onPress={handleSaveMatch}
           disabled={!hasMatchStarted(state)}
         />
@@ -129,13 +140,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.three,
+    gap: Spacing.two,
   },
-  setScore: {
+  bigScore: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: Colors.accent,
+    marginHorizontal: Spacing.two,
+  },
+  chips: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.one,
+  },
+  chip: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.accent,
+    backgroundColor: Colors.track,
     paddingHorizontal: Spacing.two,
     paddingVertical: Spacing.half,
-    borderRadius: Spacing.two,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.border,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  center: {
+    textAlign: 'center',
+  },
+  tileRow: {
+    flexDirection: 'row',
+    gap: Spacing.three,
+  },
+  pointTile: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.four,
+    backgroundColor: Colors.track,
+    borderRadius: 20,
+  },
+  pointValue: {
+    fontSize: 48,
+    fontWeight: '800',
+    color: Colors.accent,
+  },
+  half: {
+    flex: 1,
   },
 });

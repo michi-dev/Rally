@@ -28,8 +28,15 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
+    lineHeight: 40,
+    fontWeight: 800,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    color: Colors.textMuted,
   },
   code: {
     fontFamily: MonoFont,

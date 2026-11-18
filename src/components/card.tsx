@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { ThemedView } from '@/components/themed-view';
-import { Colors, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 
 type CardProps = {
   children: ReactNode;
@@ -23,7 +23,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.border,
   },
 });

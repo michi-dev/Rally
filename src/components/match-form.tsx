@@ -49,7 +49,7 @@ export function MatchForm({ players, onStartMatch }: MatchFormProps) {
         onSelect={setPlayer2Id}
       />
 
-      <ThemedText type="small">Format</ThemedText>
+      <ThemedText type="label">Match-Format</ThemedText>
       <PillRow>
         {BEST_OF_OPTIONS.map((option) => (
           <PillButton
@@ -62,7 +62,7 @@ export function MatchForm({ players, onStartMatch }: MatchFormProps) {
       </PillRow>
 
       <PillRow>
-        <PillButton label="Match starten" onPress={handleStartMatch} disabled={!canStartMatch} />
+        <PillButton label="Match starten" strong onPress={handleStartMatch} disabled={!canStartMatch} />
       </PillRow>
     </Card>
   );
@@ -78,7 +78,7 @@ type PlayerPickerProps = {
 function PlayerPicker({ label, players, selectedId, onSelect }: PlayerPickerProps) {
   return (
     <>
-      <ThemedText type="small">{label}</ThemedText>
+      <ThemedText type="label">{label}</ThemedText>
       <PillRow>
         {players.map((player) => (
           <PillButton

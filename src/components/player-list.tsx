@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { Avatar } from '@/components/avatar';
 import { Card } from '@/components/card';
 import { PillButton } from '@/components/pill-button';
 import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import type { Player } from '@/lib/database';
 
 type PlayerListProps = {
@@ -28,9 +29,10 @@ export function PlayerList({ players, onDeletePlayer }: PlayerListProps) {
 
   return (
     <Card>
-      <ThemedText type="small">Spieler</ThemedText>
+      <ThemedText type="label">Spieler</ThemedText>
       {players.map((player) => (
         <View key={player.id} style={styles.row}>
+          <Avatar name={player.name} />
           <ThemedText type="smallBold" style={styles.name}>
             {player.name}
           </ThemedText>
@@ -43,7 +45,11 @@ export function PlayerList({ players, onDeletePlayer }: PlayerListProps) {
               <PillButton label="Nein" muted onPress={() => setPendingDeleteId(null)} />
             </>
           ) : (
-            <PillButton label="Löschen" muted onPress={() => setPendingDeleteId(player.id)} />
+            <Pressable onPress={() => setPendingDeleteId(player.id)} accessibilityRole="button">
+              <ThemedText type="small" style={styles.delete}>
+                Löschen
+              </ThemedText>
+            </Pressable>
           )}
         </View>
       ))}
@@ -56,8 +62,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
+    paddingBottom: Spacing.three,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.track,
   },
   name: {
     flex: 1,
+  },
+  delete: {
+    color: Colors.error,
   },
 });
