@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { ThemedView } from '@/components/themed-view';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 type ScreenProps = {
   children: ReactNode;
@@ -10,18 +9,16 @@ type ScreenProps = {
 
 export function Screen({ children }: ScreenProps) {
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {children}
-      </ScrollView>
-    </ThemedView>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E7E5D7',
+    backgroundColor: Colors.backgroundScreen,
   },
   content: {
     alignItems: 'center',

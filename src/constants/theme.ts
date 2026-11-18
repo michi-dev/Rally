@@ -1,56 +1,32 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import '@/global.css';
 
 import { Platform } from 'react-native';
 
+/** Alle Farben der App. Die App hat bewusst nur ein helles Farbschema. */
 export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#ffffff',
-    backgroundSelected: '#EDEDED',
-    textSecondary: '#000000',
-    border: '#000000',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    border: '#ffffff',
-  },
+  text: '#17485A',
+  textMuted: '#9A9A8E',
+  textPlaceholder: '#8A8A8A',
+  textOnBrand: '#FFFFFF',
+  textOnBrandMuted: '#90C4D8',
+  error: '#B3261E',
+  background: '#FFFFFF',
+  backgroundElement: '#FFFFFF',
+  backgroundSelected: '#EDEDED',
+  backgroundScreen: '#E7E5D7',
+  border: '#000000',
+  brand: '#17485A',
+  accent: '#3AA3B8',
+  win: '#8DB33A',
+  track: '#EEEDE6'
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export type ThemeColor = keyof typeof Colors;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
-  },
+export const MonoFont = Platform.select({
+  ios: 'ui-monospace',
+  web: 'var(--font-mono)',
+  default: 'monospace',
 });
 
 export const Spacing = {
@@ -64,5 +40,4 @@ export const Spacing = {
   six: 64,
 } as const;
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
