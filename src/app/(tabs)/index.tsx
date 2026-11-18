@@ -1,57 +1,35 @@
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
-
-import HeaderCard from '@/components/header-card';
+import { Card } from '@/components/card';
+import { ErrorMessage } from '@/components/error-message';
+import { HeaderCard } from '@/components/header-card';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
-import { getGames, getPlayers, initDatabase, type Game, type Player } from '@/lib/players-db';
-import { StyleSheet } from 'react-native';
+import { useMatchData } from '@/hooks/use-match-data';
+import type { Player } from '@/lib/database';
+import { formatSetScores } from '@/lib/tennis-scoring';
+
+function playerName(players: Player[], playerId: number): string {
+  return players.find((player) => player.id === playerId)?.name ?? 'Gelöschter Spieler';
+}
 
 export default function HistoryScreen() {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [games, setGames] = useState<Game[]>([]);
+  const { players, games, error } = useMatchData();
+  const newestGamesFirst = [...games].reverse();
 
-  useFocusEffect(
-    useCallback(() => {
-      async function load() {
-        await initDatabase();
-        setPlayers(await getPlayers());
-        setGames(await getGames());
-      }
-      load();
-    }, []),
-  );
-
-
-  function nameOf(id: number) {
-    return players.find((p) => p.id === id)?.name ?? 'Unbekannt';
-  }
-
-   return (
+  return (
     <Screen>
-      <HeaderCard logo="Rally" title="Matchverlauf" subtitle={`${games.length} Matches`} />
-      <ThemedView type="backgroundElement" style={styles.card}>
-        {[...games].reverse().map((game) => (
+      <HeaderCard title="Matchverlauf" subtitle={`${games.length} Matches`} />
+      <ErrorMessage message={error} />
+      <Card>
+        {newestGamesFirst.length === 0 && (
+          <ThemedText type="small">Noch keine Matches gespielt.</ThemedText>
+        )}
+        {newestGamesFirst.map((game) => (
           <ThemedText key={game.id} type="small">
-            {nameOf(game.p1_fk)} {game.sets.replace('/', ' : ')} {nameOf(game.p2_fk)} · {game.games}
+            {playerName(players, game.player1Id)} {game.sets1} : {game.sets2}{' '}
+            {playerName(players, game.player2Id)} · {formatSetScores(game.setScores)}
           </ThemedText>
         ))}
-      </ThemedView>
+      </Card>
     </Screen>
   );
 }
-
-
-const styles = StyleSheet.create({
-  card: {
-    alignSelf: 'stretch',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-});
-

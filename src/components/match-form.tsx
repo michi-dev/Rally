@@ -1,135 +1,94 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
 
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import { Card } from '@/components/card';
+import { PillButton, PillRow } from '@/components/pill-button';
+import { ThemedText } from '@/components/themed-text';
+import type { Player } from '@/lib/database';
+import type { BestOf } from '@/lib/tennis-scoring';
 
-import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
-import type { Player } from '@/lib/players-db';
-
-export type MatchFormat = '1' | '3';
+const BEST_OF_OPTIONS: { value: BestOf; label: string }[] = [
+  { value: 1, label: '1 Satz' },
+  { value: 3, label: '3 Sätze' },
+];
 
 type MatchFormProps = {
   players: Player[];
-  onStartMatch: (player1: Player, player2: Player, format: MatchFormat) => void;
+  onStartMatch: (player1: Player, player2: Player, bestOf: BestOf) => void;
 };
 
 export function MatchForm({ players, onStartMatch }: MatchFormProps) {
-  const theme = useTheme();
   const [player1Id, setPlayer1Id] = useState<number | null>(null);
   const [player2Id, setPlayer2Id] = useState<number | null>(null);
-  const [matchFormat, setMatchFormat] = useState<MatchFormat>('3');
+  const [bestOf, setBestOf] = useState<BestOf>(3);
 
-  const canStartMatch = player1Id !== null && player2Id !== null && player1Id !== player2Id;
+  const player1 = players.find((player) => player.id === player1Id);
+  const player2 = players.find((player) => player.id === player2Id);
+  const canStartMatch = !!player1 && !!player2 && player1.id !== player2.id;
 
   function handleStartMatch() {
-    const player1 = players.find((p) => p.id === player1Id);
-    const player2 = players.find((p) => p.id === player2Id);
-    if (!canStartMatch || !player1 || !player2) return;
-    onStartMatch(player1, player2, matchFormat);
+    if (!canStartMatch) return;
+    onStartMatch(player1, player2, bestOf);
   }
 
   return (
-    <ThemedView type="backgroundElement" style={[styles.stepContainer, { borderColor: theme.border }]}>
-      <ThemedText type="code" style={styles.code}>
-        match
-      </ThemedText>
+    <Card>
+      {players.length < 2 && (
+        <ThemedText type="small">Erfasse zuerst mindestens zwei Spieler.</ThemedText>
+      )}
 
-      <ThemedText type="small">Spieler 1</ThemedText>
-      <ThemedView style={styles.pillRow}>
-        {players.map((player) => (
-          <Pressable key={player.id} onPress={() => setPlayer1Id(player.id)}>
-            <ThemedView
-              type={player.id === player1Id ? 'backgroundSelected' : 'backgroundElement'}
-              style={[styles.pill, { borderColor: theme.border }]}
-            >
-              <ThemedText type="smallBold">{player.name}</ThemedText>
-            </ThemedView>
-          </Pressable>
-        ))}
-      </ThemedView>
-
-      <ThemedText type="small">Spieler 2</ThemedText>
-      <ThemedView style={styles.pillRow}>
-        {players.map((player) => (
-          <Pressable key={player.id} onPress={() => setPlayer2Id(player.id)}>
-            <ThemedView
-              type={player.id === player2Id ? 'backgroundSelected' : 'backgroundElement'}
-              style={[styles.pill, { borderColor: theme.border }]}
-            >
-              <ThemedText type="smallBold">{player.name}</ThemedText>
-            </ThemedView>
-          </Pressable>
-        ))}
-      </ThemedView>
+      <PlayerPicker
+        label="Spieler 1"
+        players={players}
+        selectedId={player1Id}
+        onSelect={setPlayer1Id}
+      />
+      <PlayerPicker
+        label="Spieler 2"
+        players={players}
+        selectedId={player2Id}
+        onSelect={setPlayer2Id}
+      />
 
       <ThemedText type="small">Format</ThemedText>
-      <ThemedView style={styles.pillRow}>
-        <Pressable onPress={() => setMatchFormat('1')}>
-          <ThemedView
-            type={matchFormat === '1' ? 'backgroundSelected' : 'backgroundElement'}
-            style={[styles.pill, { borderColor: theme.border }]}
-          >
-            <ThemedText type="smallBold">1 Satz</ThemedText>
-          </ThemedView>
-        </Pressable>
-        <Pressable onPress={() => setMatchFormat('3')}>
-          <ThemedView
-            type={matchFormat === '3' ? 'backgroundSelected' : 'backgroundElement'}
-            style={[styles.pill, { borderColor: theme.border }]}
-          >
-            <ThemedText type="smallBold">3 Sätze</ThemedText>
-          </ThemedView>
-        </Pressable>
-      </ThemedView>
+      <PillRow>
+        {BEST_OF_OPTIONS.map((option) => (
+          <PillButton
+            key={option.value}
+            label={option.label}
+            muted={option.value !== bestOf}
+            onPress={() => setBestOf(option.value)}
+          />
+        ))}
+      </PillRow>
 
-      <Pressable onPress={handleStartMatch} disabled={!canStartMatch} style={styles.addButton}>
-        <ThemedView
-          type="backgroundSelected"
-          style={[styles.addButtonInner, { borderColor: theme.border }, !canStartMatch && styles.addButtonDisabled]}
-        >
-          <ThemedText type="smallBold">Match starten</ThemedText>
-        </ThemedView>
-      </Pressable>
-    </ThemedView>
+      <PillRow>
+        <PillButton label="Match starten" onPress={handleStartMatch} disabled={!canStartMatch} />
+      </PillRow>
+    </Card>
   );
 }
 
-const styles = StyleSheet.create({
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  addButton: {
-    alignSelf: 'flex-start',
-  },
-  addButtonInner: {
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  addButtonDisabled: {
-    opacity: 0.4,
-  },
-  pillRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  pill: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-});
+type PlayerPickerProps = {
+  label: string;
+  players: Player[];
+  selectedId: number | null;
+  onSelect: (playerId: number) => void;
+};
+
+function PlayerPicker({ label, players, selectedId, onSelect }: PlayerPickerProps) {
+  return (
+    <>
+      <ThemedText type="small">{label}</ThemedText>
+      <PillRow>
+        {players.map((player) => (
+          <PillButton
+            key={player.id}
+            label={player.name}
+            muted={player.id !== selectedId}
+            onPress={() => onSelect(player.id)}
+          />
+        ))}
+      </PillRow>
+    </>
+  );
+}
