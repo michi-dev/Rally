@@ -2,6 +2,8 @@
 
 Mobile App zum Erfassen und Verwalten von Tennis-Matches. Trainer behalten den Überblick über mehrere Spiele und Spieler gleichzeitig – Ergebnisse werden automatisch mitgezählt.
 
+**Live-Version:** https://michi-dev.github.io/Rally/
+
 ## Features
 
 - **Matchverlauf** – Übersicht aller vergangenen Matches mit Satzresultaten
@@ -25,6 +27,10 @@ npx expo start
 ```
 
 Danach im Terminal `w` für den Browser drücken (http://localhost:8081), `i` für den iOS-Simulator oder `a` für Android. Alternativ den QR-Code mit Expo Go scannen.
+
+## Deployment
+
+Jeder Push auf `main` baut die Web-Version per GitHub Actions ([.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)) und veröffentlicht sie auf GitHub Pages. Weil die Seite unter `/Rally/` läuft, setzt der Workflow `EXPO_BASE_URL=/Rally` (siehe [app.config.js](app.config.js)). Lokal bleibt die App unter `/` erreichbar.
 
 ## Scripts
 
