@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { Card } from '@/components/card';
 import { ErrorMessage } from '@/components/error-message';
@@ -8,6 +8,7 @@ import { LoadingIndicator } from '@/components/loading-indicator';
 import { MatchCounter, type MatchResult } from '@/components/match-counter';
 import { PillButton, PillRow } from '@/components/pill-button';
 import { Screen } from '@/components/screen';
+import { useLeaveConfirmation } from '@/hooks/use-leave-confirmation';
 import { useMatchData } from '@/hooks/use-match-data';
 import { addGame } from '@/lib/database';
 import type { BestOf } from '@/lib/tennis-scoring';
@@ -36,6 +37,12 @@ export default function MatchScreen() {
   const params = useLocalSearchParams<MatchParams>();
   const { players, isLoading, error: loadError } = useMatchData();
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Ref statt State: Beim Speichern muss die Sperre sofort weg sein, nicht erst nach dem nächsten Render.
+  const hasProgressRef = useRef(false);
+  const handleProgressChange = useCallback((hasProgress: boolean) => {
+    hasProgressRef.current = hasProgress;
+  }, []);
+  useLeaveConfirmation(hasProgressRef);
 
   const player1 = players.find((player) => player.id === Number(params.player1Id));
   const player2 = players.find((player) => player.id === Number(params.player2Id));
@@ -49,6 +56,7 @@ export default function MatchScreen() {
       setSaveError('Match konnte nicht gespeichert werden.');
       return;
     }
+    hasProgressRef.current = false;
     // Match-Screen schliessen und im Verlauf das neue Match zeigen.
     router.dismissTo('/');
   }
@@ -74,6 +82,7 @@ export default function MatchScreen() {
         bestOf={bestOf}
         onSaveMatch={handleSaveMatch}
         onCancelMatch={goBack}
+        onProgressChange={handleProgressChange}
       />
     );
   }

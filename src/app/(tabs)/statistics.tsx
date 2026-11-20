@@ -42,6 +42,11 @@ export default function StatisticsScreen() {
 
           <Card>
             <ThemedText type="label">Spieler-Bilanz</ThemedText>
+            {stats.ranking.length === 0 && (
+              <ThemedText type="small">
+                Noch keine Spieler erfasst. Lege unter «+» die ersten Spieler an.
+              </ThemedText>
+            )}
             {stats.ranking.map((row, index) => {
               const percent = Math.round(row.winRate * 100);
               const avatarColor = index === 0 ? Colors.accent : Colors.win;

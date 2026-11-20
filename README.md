@@ -13,9 +13,13 @@ Mobile App zum Erfassen und Verwalten von Tennis-Matches. Trainer behalten den �
 
 ## Screenshots
 
-| Verlauf | Neues Match | Live-Match | Statistik |
-| --- | --- | --- | --- |
+| Verlauf                                          | Neues Match                                         | Live-Match                                        | Statistik                                       |
+| ------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------- |
 | ![Matchverlauf](docs/screenshots/01-verlauf.png) | ![Neues Match](docs/screenshots/02-neues-match.png) | ![Live-Match](docs/screenshots/03-live-match.png) | ![Statistik](docs/screenshots/04-statistik.png) |
+
+### Demo-Video
+
+[docs/rally-demo.mp4](docs/rally-demo.mp4) (45 s): Verlauf → Statistik → Neues Match → Live-Match mit Undo → Speichern → Verlauf.
 
 ## Setup
 
@@ -34,13 +38,13 @@ Jeder Push auf `main` baut die Web-Version per GitHub Actions ([.github/workflow
 
 ## Scripts
 
-| Befehl | Beschreibung |
-| --- | --- |
-| `npm start` | Startet den Expo-Dev-Server |
-| `npm run web` | Startet direkt im Browser |
-| `npm run ios` | Startet im iOS-Simulator |
-| `npm run android` | Startet im Android-Emulator |
-| `npm run lint` | Prüft den Code mit ESLint (`expo lint`) |
+| Befehl            | Beschreibung                            |
+| ----------------- | --------------------------------------- |
+| `npm start`       | Startet den Expo-Dev-Server             |
+| `npm run web`     | Startet direkt im Browser               |
+| `npm run ios`     | Startet im iOS-Simulator                |
+| `npm run android` | Startet im Android-Emulator             |
+| `npm run lint`    | Prüft den Code mit ESLint (`expo lint`) |
 
 ## Architektur
 
@@ -69,12 +73,12 @@ src/
 
 **Datenfluss:** Screens holen die Daten über `useMatchData()` und schreiben über die Funktionen in `lib/database.ts`. Die Logik in `lib/` ist reines TypeScript ohne React und lässt sich deshalb getrennt von der UI testen.
 
-**Navigation:** Unter `/new-match` werden die Spieler und das Format gewählt. "Match starten" öffnet `/match?player1Id=…&player2Id=…&bestOf=…` als eigenen Screen auf dem Stack. Nach dem Speichern führt `router.dismissTo('/')` zurück zum Verlauf. "Abbrechen", die Zurück-Geste oder der Browser-Zurück-Button schliessen das Match, ohne zu speichern.
+**Navigation:** Unter `/new-match` werden die Spieler und das Format gewählt. "Match starten" öffnet `/match?player1Id=…&player2Id=…&bestOf=…` als eigenen Screen auf dem Stack. Nach dem Speichern führt `router.dismissTo('/')` zurück zum Verlauf. "Abbrechen", die Zurück-Geste oder der Browser-Zurück-Button schliessen das Match ohne zu speichern. Läuft das Match bereits, fragt die App vorher nach, ob der Spielstand verworfen werden soll. Auch beim Neuladen oder Schliessen des Browser-Tabs fragt der Browser nach.
 
 ## Bekannte Probleme
 
 - **Nur lokale Daten:** AsyncStorage speichert pro Gerät bzw. Browser. Es gibt keine Synchronisation und kein Backup. Wer die Browserdaten löscht, verliert alle Matches.
-- **Laufendes Match ist flüchtig:** Der Spielstand wird erst beim Speichern geschrieben. Wer den Live-Match-Screen verlässt oder die Seite neu lädt, verliert das laufende Match. Eine Rückfrage gibt es nicht.
+- **Browser-Zurück im Live-Match:** Die Rückfrage beim Browser-Zurück nutzt die Navigation API des Browsers. Ältere Browser ohne diese API verlassen das Match dabei ohne Rückfrage. "Abbrechen" fragt in jedem Fall nach.
 - **Kein Bearbeiten/Löschen von Matches:** Gespeicherte Matches lassen sich nicht mehr ändern.
 - **Gelöschte Spieler:** Ihre Matches bleiben erhalten und erscheinen als "Gelöschter Spieler". In der Spielerbilanz fehlen sie.
 - **Manuell beendete Matches bei Satzgleichstand** (z. B. 1:1) haben keinen Sieger und zählen in der Bilanz weder als Sieg noch als Niederlage.
@@ -83,9 +87,9 @@ src/
 
 ## Team & Aufgabenteilung
 
-| Person | Beiträge |
-| --- | --- |
-| **Anya Zettel** | HeaderCard, Tab-Navigation und Screen-Layout, Statistik-Logik und -Ansicht, Aufteilung von Verlauf und Neues Match, Design-Überarbeitung (Avatare, Karten, Farben, Statistik-UI) |
+| Person               | Beiträge                                                                                                                                                                                                                                           |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Anya Zettel**      | HeaderCard, Tab-Navigation und Screen-Layout, Statistik-Logik und -Ansicht, Aufteilung von Verlauf und Neues Match, Design-Überarbeitung (Avatare, Karten, Farben, Statistik-UI)                                                                   |
 | **Michael Schädler** | Datenbank mit AsyncStorage inkl. Beispieldaten und Migration, Match-Formular, Match-Counter und Tennis-Zähllogik, Clean-Code-Refactoring, Spieler erfassen und löschen, Speichern und Satzverteilung, Live-Match-Screen, Ladezustand, Undo, README |
 
 ## Konzept

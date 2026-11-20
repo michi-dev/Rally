@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
@@ -34,6 +34,8 @@ type MatchCounterProps = {
   onSaveMatch: (result: MatchResult) => void;
   /** Verwirft das Match, ohne etwas zu speichern. */
   onCancelMatch: () => void;
+  /** Meldet, ob es einen Spielstand gibt, der beim Verlassen verloren ginge. */
+  onProgressChange?: (hasProgress: boolean) => void;
 };
 
 export function MatchCounter({
@@ -42,11 +44,17 @@ export function MatchCounter({
   bestOf,
   onSaveMatch,
   onCancelMatch,
+  onProgressChange,
 }: MatchCounterProps) {
   // Alle bisherigen Spielstände, damit sich der letzte Punkt rückgängig machen lässt.
   const [history, setHistory] = useState<MatchState[]>([INITIAL_MATCH_STATE]);
   const state = history[history.length - 1];
   const canUndo = history.length > 1;
+  const hasProgress = hasMatchStarted(state);
+
+  useEffect(() => {
+    onProgressChange?.(hasProgress);
+  }, [hasProgress, onProgressChange]);
   const winnerSide = getMatchWinner(state, bestOf);
   const playersBySide: Record<PlayerSide, Player> = { player1, player2 };
   const winner = winnerSide ? playersBySide[winnerSide] : null;
@@ -135,12 +143,7 @@ export function MatchCounter({
       )}
 
       <PillRow>
-        <PillButton
-          label="Speichern"
-          strong
-          onPress={handleSaveMatch}
-          disabled={!hasMatchStarted(state)}
-        />
+        <PillButton label="Speichern" strong onPress={handleSaveMatch} disabled={!hasProgress} />
         <PillButton label="↶ Letzter Punkt" muted onPress={handleUndo} disabled={!canUndo} />
         {!winner && <PillButton label="Abbrechen" muted onPress={onCancelMatch} />}
       </PillRow>
