@@ -6,15 +6,14 @@ import { Colors, Spacing } from '@/constants/theme';
 type HeaderCardProps = {
   title: string;
   subtitle: string;
-  logo?: string;
 };
 
-export function HeaderCard({ title, subtitle, logo = 'Rally' }: HeaderCardProps) {
+export function HeaderCard({ title, subtitle }: HeaderCardProps) {
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + Spacing.five }]}>
-      <Text style={styles.logo}>{logo}</Text>
+      <Text style={styles.logo}>Rally</Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
     </View>
@@ -35,7 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
   },
   title: {
     color: Colors.textOnBrand,

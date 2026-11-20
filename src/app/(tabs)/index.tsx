@@ -4,6 +4,7 @@ import { Avatar } from '@/components/avatar';
 import { Card } from '@/components/card';
 import { ErrorMessage } from '@/components/error-message';
 import { HeaderCard } from '@/components/header-card';
+import { LoadingIndicator } from '@/components/loading-indicator';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, Spacing } from '@/constants/theme';
@@ -15,15 +16,16 @@ function playerName(players: Player[], playerId: number): string {
 }
 
 export default function HistoryScreen() {
-  const { players, games, error } = useMatchData();
+  const { players, games, isLoading, error } = useMatchData();
   const newestGamesFirst = [...games].reverse();
 
   return (
     <Screen>
       <HeaderCard title="Matchverlauf" subtitle={`${games.length} Matches`} />
       <ErrorMessage message={error} />
+      {isLoading && <LoadingIndicator />}
 
-      {newestGamesFirst.length === 0 && (
+      {!isLoading && newestGamesFirst.length === 0 && (
         <Card>
           <ThemedText type="small">Noch keine Matches gespielt.</ThemedText>
         </Card>

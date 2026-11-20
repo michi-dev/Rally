@@ -1,6 +1,6 @@
-import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
+import { StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Colors, MonoFont } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export type ThemedTextProps = TextProps & {
   type?: keyof typeof styles;
@@ -26,21 +26,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: 700,
   },
-  subtitle: {
-    fontSize: 32,
-    lineHeight: 40,
-    fontWeight: 800,
-  },
   label: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     color: Colors.textMuted,
-  },
-  code: {
-    fontFamily: MonoFont,
-    fontWeight: Platform.select({ android: 700 }) ?? 500,
-    fontSize: 12,
   },
 });

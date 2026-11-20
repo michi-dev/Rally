@@ -1,7 +1,3 @@
-import '@/global.css';
-
-import { Platform } from 'react-native';
-
 /** Alle Farben der App. Die App hat bewusst nur ein helles Farbschema. */
 export const Colors = {
   text: '#17485A',
@@ -12,22 +8,14 @@ export const Colors = {
   error: '#B3261E',
   background: '#FFFFFF',
   backgroundElement: '#FFFFFF',
-  backgroundSelected: '#EDEDED',
   backgroundScreen: '#E7E5D7',
-  border: '#000000',
   brand: '#17485A',
   accent: '#3AA3B8',
   win: '#8DB33A',
-  track: '#EEEDE6'
+  track: '#EEEDE6',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;
-
-export const MonoFont = Platform.select({
-  ios: 'ui-monospace',
-  web: 'var(--font-mono)',
-  default: 'monospace',
-});
 
 export const Spacing = {
   none: 0,

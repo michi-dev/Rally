@@ -7,6 +7,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors, Spacing } from '@/constants/theme';
 import type { Player } from '@/lib/database';
 
+/** Längere Namen sprengen die Score-Anzeige und die Buttons im Live-Match. */
+const MAX_NAME_LENGTH = 20;
+
 type AddPlayerFormProps = {
   players: Player[];
   onAddPlayer: (name: string) => void;
@@ -36,9 +39,17 @@ export function AddPlayerForm({ players, onAddPlayer }: AddPlayerFormProps) {
         placeholder="Name"
         placeholderTextColor={Colors.textPlaceholder}
         style={styles.input}
+        maxLength={MAX_NAME_LENGTH}
         accessibilityLabel="Name des neuen Spielers"
       />
-      {nameExists && <ThemedText style={{color:Colors.error}} type="small">Diesen Spieler gibt es bereits.</ThemedText>}
+      <ThemedText type="label" style={styles.counter}>
+        {`${trimmedName.length}/${MAX_NAME_LENGTH}`}
+      </ThemedText>
+      {nameExists && (
+        <ThemedText style={styles.error} type="small">
+          Diesen Spieler gibt es bereits.
+        </ThemedText>
+      )}
       <PillRow>
         <PillButton label="Spieler hinzufügen" onPress={handleAddPlayer} disabled={!canAddPlayer} />
       </PillRow>
@@ -55,5 +66,11 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontSize: 16,
     backgroundColor: Colors.track,
+  },
+  counter: {
+    alignSelf: 'flex-end',
+  },
+  error: {
+    color: Colors.error,
   },
 });

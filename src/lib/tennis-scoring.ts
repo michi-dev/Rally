@@ -134,16 +134,8 @@ export function getPlayedSetScores(state: MatchState): SetScore[] {
     : state.setHistory;
 }
 
-export function isDeuce(state: MatchState): boolean {
-  return !state.isTiebreak && state.points1 >= POINTS_FOR_DEUCE && state.points1 === state.points2;
-}
-
 /** Anzeige eines Punktestands in Tennis-Notation: 0, 15, 30, 40 oder "Ad" (Vorteil). */
 export function getPointsLabel(points: number, opponentPoints: number): string {
   if (points < POINTS_FOR_DEUCE || opponentPoints < POINTS_FOR_DEUCE) return POINT_LABELS[points];
   return points > opponentPoints ? 'Ad' : '40';
-}
-
-export function formatSetScores(setScores: SetScore[]): string {
-  return setScores.map((set) => `${set.games1}:${set.games2}`).join(', ');
 }

@@ -62,7 +62,12 @@ export function MatchForm({ players, onStartMatch }: MatchFormProps) {
       </PillRow>
 
       <PillRow>
-        <PillButton label="Match starten" strong onPress={handleStartMatch} disabled={!canStartMatch} />
+        <PillButton
+          label="Match starten"
+          strong
+          onPress={handleStartMatch}
+          disabled={!canStartMatch}
+        />
       </PillRow>
     </Card>
   );

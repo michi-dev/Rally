@@ -43,14 +43,21 @@ export function MatchCounter({
   onSaveMatch,
   onCancelMatch,
 }: MatchCounterProps) {
-  const [state, setState] = useState<MatchState>(INITIAL_MATCH_STATE);
+  // Alle bisherigen Spielstände, damit sich der letzte Punkt rückgängig machen lässt.
+  const [history, setHistory] = useState<MatchState[]>([INITIAL_MATCH_STATE]);
+  const state = history[history.length - 1];
+  const canUndo = history.length > 1;
   const winnerSide = getMatchWinner(state, bestOf);
   const playersBySide: Record<PlayerSide, Player> = { player1, player2 };
   const winner = winnerSide ? playersBySide[winnerSide] : null;
 
   function handlePoint(scorer: PlayerSide) {
     if (winner) return;
-    setState((previous) => scorePoint(previous, scorer));
+    setHistory((previous) => [...previous, scorePoint(previous[previous.length - 1], scorer)]);
+  }
+
+  function handleUndo() {
+    setHistory((previous) => (previous.length > 1 ? previous.slice(0, -1) : previous));
   }
 
   function handleSaveMatch() {
@@ -88,18 +95,23 @@ export function MatchCounter({
       ) : (
         <>
           <ThemedText type="label" style={styles.center}>
-            {state.isTiebreak ? 'Tiebreak' : 'Aktuelles Spiel'} · {state.games1}:{state.games2} Games
+            {state.isTiebreak ? 'Tiebreak' : 'Aktuelles Spiel'} · {state.games1}:{state.games2}{' '}
+            Games
           </ThemedText>
           <View style={styles.tileRow}>
             <View style={styles.pointTile}>
               <Text style={styles.pointValue}>
-                {state.isTiebreak ? state.tiebreakPoints1 : getPointsLabel(state.points1, state.points2)}
+                {state.isTiebreak
+                  ? state.tiebreakPoints1
+                  : getPointsLabel(state.points1, state.points2)}
               </Text>
               <ThemedText type="small">{player1.name}</ThemedText>
             </View>
             <View style={styles.pointTile}>
               <Text style={styles.pointValue}>
-                {state.isTiebreak ? state.tiebreakPoints2 : getPointsLabel(state.points2, state.points1)}
+                {state.isTiebreak
+                  ? state.tiebreakPoints2
+                  : getPointsLabel(state.points2, state.points1)}
               </Text>
               <ThemedText type="small">{player2.name}</ThemedText>
             </View>
@@ -129,6 +141,7 @@ export function MatchCounter({
           onPress={handleSaveMatch}
           disabled={!hasMatchStarted(state)}
         />
+        <PillButton label="↶ Letzter Punkt" muted onPress={handleUndo} disabled={!canUndo} />
         {!winner && <PillButton label="Abbrechen" muted onPress={onCancelMatch} />}
       </PillRow>
     </Card>

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
+/** Stack: die drei Tabs als Basis, darüber das Live-Match als eigener Screen. */
 export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
@@ -11,7 +12,10 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="match" options={{ title: 'Live-Match' }} />
+      </Stack>
     </ThemeProvider>
   );
 }

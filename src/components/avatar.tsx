@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
-export function initials(name: string): string {
+function initials(name: string): string {
   return name
     .split(' ')
     .map((part) => part[0])
