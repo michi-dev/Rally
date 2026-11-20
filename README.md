@@ -19,7 +19,7 @@ Mobile App zum Erfassen und Verwalten von Tennis-Matches. Trainer behalten den �
 
 ### Demo-Video
 
-[docs/rally-demo.mp4](docs/rally-demo.mp4) (45 s): Verlauf → Statistik → Neues Match → Live-Match mit Undo → Speichern → Verlauf.
+▶️ **[Video im Browser abspielen](https://michi-dev.github.io/Rally/rally-demo.mp4)** (45 s): Verlauf → Statistik → Neues Match → Live-Match mit Undo → Speichern → Verlauf. Die Datei liegt unter [docs/rally-demo.mp4](docs/rally-demo.mp4).
 
 ## Setup
 
